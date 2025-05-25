@@ -4,14 +4,33 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#define VERIFICAR_INTEGRIDADE
 
 #define REGISTRO_TAM 90
 
 Tenis lerTenis() {
-    Tenis t;
-    printf("Codigo: ");
-    scanf("%d", &t.codigo);
-    while(getchar() != '\n'); // Limpa buffer
+    Tenis t = {0};
+    
+    do {
+        printf("Codigo: ");
+        if (scanf("%d", &t.codigo) != 1 || t.codigo <= 0) {
+            printf("Codigo invalido! Deve ser um numero positivo.\n");
+            limparBuffer();
+            continue;
+        }
+        
+        // Verifica se código já existe
+        #ifdef VERIFICAR_INTEGRIDADE
+        if (buscarNaArvoreB(t.codigo) != -1) {
+            printf("Erro: Codigo %d ja existe!\n", t.codigo);
+            t.codigo = 0;
+            continue;
+        }
+        #endif
+        
+        break;
+    } while (1);
+    limparBuffer();
     
     printf("Marca: ");
     fgets(t.marca, sizeof(t.marca), stdin);
@@ -21,31 +40,52 @@ Tenis lerTenis() {
     fgets(t.modelo, sizeof(t.modelo), stdin);
     t.modelo[strcspn(t.modelo, "\n")] = '\0';
     
-    printf("Preco: ");
-    while(scanf("%f", &t.preco) != 1) { // Validação do preço
-        printf("Preco invalido. Digite novamente: ");
-        while(getchar() != '\n'); // Limpa buffer
-    }
-    while(getchar() != '\n'); // Limpa buffer
+    do {
+        printf("Preco: ");
+        if (scanf("%f", &t.preco) != 1 || t.preco <= 0) {
+            printf("Preco invalido! Deve ser um valor positivo.\n");
+            limparBuffer();
+            continue;
+        }
+        break;
+    } while (1);
+    limparBuffer();
     
-    printf("Tamanho: ");
-    scanf("%d", &t.tamanho);
-    while(getchar() != '\n'); // Limpa buffer
+    do {
+        printf("Tamanho: ");
+        if (scanf("%d", &t.tamanho) != 1 || t.tamanho <= 0) {
+            printf("Tamanho invalido! Deve ser um numero positivo.\n");
+            limparBuffer();
+            continue;
+        }
+        break;
+    } while (1);
+    limparBuffer();
     
-    printf("Quantidade: ");
-    scanf("%d", &t.quantidade);
-    while(getchar() != '\n'); // Limpa buffer
+    do {
+        printf("Quantidade: ");
+        if (scanf("%d", &t.quantidade) != 1 || t.quantidade < 0) {
+            printf("Quantidade invalida! Deve ser um numero nao negativo.\n");
+            limparBuffer();
+            continue;
+        }
+        break;
+    } while (1);
+    limparBuffer();
     
     return t;
 }
-
 void exibirTenis(Tenis t) {
-    if (t.codigo != 0) {
+    if(t.codigo != 0) {
         printf("Codigo: %d | Marca: %s | Modelo: %s | Preco: %.2f | Tamanho: %d | Quantidade: %d\n",
-               t.codigo, t.marca, t.modelo, t.preco, t.tamanho, t.quantidade);
+               t.codigo, 
+               t.marca, 
+               t.modelo, 
+               t.preco, 
+               t.tamanho, 
+               t.quantidade);
     }
 }
-
 char *formatarTenis(Tenis t) {
     static char linha[REGISTRO_TAM + 1] = {0}; // Inicializa com zeros
     snprintf(linha, sizeof(linha), "%05d|%-20s|%-20s|%07.2f|%02d|%02d",
@@ -60,23 +100,31 @@ Tenis lerLinhaRegistro(char *linha) {
 }
 
 void salvarTenis(Tenis t) {
-    // Verifica se o código já existe
-    if (buscarNaArvoreB(t.codigo) != -1) {
-        printf("Erro: Codigo %d ja existe!\n", t.codigo);
+    if (t.codigo == 0) {
+        printf("Erro: Tenis invalido para salvar!\n");
         return;
     }
 
     FILE *f = fopen("dados/dados.txt", "a+");
     if (!f) {
-        perror("Erro ao abrir dados/dados.txt");
-        return;
+        if (mkdir("dados", 0755) == -1) {
+            perror("Erro ao criar diretorio");
+            return;
+        }
+        f = fopen("dados/dados.txt", "a+");
+        if (!f) {
+            perror("Erro ao criar arquivo de dados");
+            return;
+        }
     }
     
     fseek(f, 0, SEEK_END);
     long pos = ftell(f);
     
-    // Verifica se há espaço suficiente
-    if (fprintf(f, "%s\n", formatarTenis(t)) < 0) {
+    char registro[REGISTRO_TAM + 2]; // +2 para \n e \0
+    snprintf(registro, sizeof(registro), "%s\n", formatarTenis(t));
+    
+    if (fwrite(registro, sizeof(char), strlen(registro), f) != strlen(registro)) {
         perror("Erro ao escrever no arquivo");
         fclose(f);
         return;
@@ -84,7 +132,7 @@ void salvarTenis(Tenis t) {
     
     fclose(f);
 
-    RegistroIndice reg = { t.codigo, pos };
+    RegistroIndice reg = {t.codigo, pos};
     inserirNaArvoreB(reg);
     printf("Tenis inserido com sucesso!\n");
 }
@@ -171,15 +219,14 @@ void removerTenis(int codigo) {
 void listarTenis() {
     printf("\n=== Lista de Tenis Ordenada ===\n");
     
-    // Verifica se há índices
     if(totalIndices == 0) {
         printf("Nenhum tenis cadastrado.\n");
         return;
     }
     
-    // Ordenação
-    for(int i = 0; i < totalIndices - 1; i++) {
-        for(int j = i + 1; j < totalIndices; j++) {
+    // Ordenação por código
+    for(int i = 0; i < totalIndices-1; i++) {
+        for(int j = i+1; j < totalIndices; j++) {
             if(indices[i].codigo > indices[j].codigo) {
                 RegistroIndice temp = indices[i];
                 indices[i] = indices[j];
@@ -194,22 +241,21 @@ void listarTenis() {
         return;
     }
     
-    // Remove duplicatas
-    int lastCode = -1;
+    int ultimoCodigo = -1;
     for(int i = 0; i < totalIndices; i++) {
-        if(indices[i].codigo == lastCode) continue;
+        // Pula códigos duplicados
+        if(indices[i].codigo == ultimoCodigo) continue;
         
         fseek(f, indices[i].pos, SEEK_SET);
-        char linha[REGISTRO_TAM + 2] = {0}; // Inicializa com zeros
+        char linha[REGISTRO_TAM + 2] = {0}; // Buffer zerado
         
         if(fgets(linha, sizeof(linha), f)) {
-            // Remove possíveis lixos no final
-            linha[strcspn(linha, "\n")] = '\0';
+            linha[strcspn(linha, "\n")] = '\0'; // Remove newline
             
             Tenis t = lerLinhaRegistro(linha);
             if(t.codigo != 0) {
                 exibirTenis(t);
-                lastCode = t.codigo;
+                ultimoCodigo = t.codigo;
             }
         }
     }
