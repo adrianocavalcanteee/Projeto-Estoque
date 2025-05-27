@@ -1,4 +1,3 @@
-// === arvoreb.h ===
 #ifndef ARVOREB_H
 #define ARVOREB_H
 

@@ -1,3 +1,5 @@
-00001|nike                |air                 |0500.00|42|12
-00002|adidas              |superstar           |0600.00|43|01
-                                                                                          
+00001|nike                force               |force               |0500.00|42|02
+00003|nike                |air max             |0499.90|41|05
+00004|mizuno              |wave prophecy       |0720.00|43|02
+00005|asics               |gel nimbus          |0650.75|40|03
+00006|ADIDAS              |SUPERSTAR           |0500.00|42|02

@@ -16,9 +16,10 @@ void exibirTenis(Tenis t);
 void salvarTenis(Tenis t);
 Tenis buscarTenis(int codigo);
 void alterarTenis(int codigo);
-void removerTenis(int codigo);
 void listarTenis();
 Tenis lerLinhaRegistro(char *linha);
 char *formatarTenis(Tenis t);
+void limparBuffer();
+void mesclarDados();
 
 #endif
