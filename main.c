@@ -38,16 +38,40 @@ int main() {
                 break;
             }
             case 2: {
-                printf("Codigo: ");
-                int codigo;
-                scanf("%d", &codigo);
-                limparBuffer();
+                printf("Digite o codigo ou termo de busca (marca/modelo): ");
+                char entrada[40];
+                fgets(entrada, sizeof(entrada), stdin);
+                entrada[strcspn(entrada, "\n")] = '\0';
                 
-                Tenis resultado;
-                if (buscarTenis(codigo, &resultado)) {
-                    exibirTenis(&resultado);
-                } else {
-                    printf("Tenis nao encontrado!\n");
+                // Verifica se é número (busca por código)
+                int codigo;
+                if (sscanf(entrada, "%d", &codigo) == 1) {
+                    Tenis resultado;
+                    if (buscarTenis(codigo, &resultado)) {
+                        exibirTenis(&resultado);
+                    } else {
+                        printf("Tenis nao encontrado!\n");
+                    }
+                } 
+                // Busca por texto (marca/modelo)
+                else {
+                    Tenis resultados[100];
+                    int quantidade = 0;
+                    if (buscarTenisPorTexto(entrada, resultados, &quantidade)) {
+                        if (quantidade > 0) {
+                            printf("\n=== Resultados da Busca ===\n");
+                            printf("COD.  | MARCA               | MODELO              | PRECO   | TM | QTD\n");
+                            printf("----------------------------------------------------------------------\n");
+                            for (int i = 0; i < quantidade; i++) {
+                                exibirTenis(&resultados[i]);
+                            }
+                            printf("Total encontrado: %d\n", quantidade);
+                        } else {
+                            printf("Nenhum tenis encontrado com '%s'\n", entrada);
+                        }
+                    } else {
+                        printf("Erro na busca!\n");
+                    }
                 }
                 break;
             }

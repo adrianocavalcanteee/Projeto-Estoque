@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#define MARCA_TAM 20
-#define MODELO_TAM 20
+#define MARCA_TAM 21
+#define MODELO_TAM 21
 #define REGISTRO_TAM 90
 
 typedef struct {
@@ -29,5 +29,8 @@ bool inicializarSistema();
 void finalizarSistema();
 bool mesclarArquivo(const char *novoArquivo);
 bool mesclarArquivoNovosTenis();
+bool buscarTenisPorTexto(const char *texto, Tenis *resultados, int *quantidade);
+
+void limparString(const char *origem, char *destino);
 
 #endif

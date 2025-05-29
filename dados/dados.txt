@@ -38,7 +38,7 @@
 00137|New Balance         |X90                 |0699.90|40|12
 00138|Asics               |Gel-Nimbus 24       |0899.90|41|13
 00139|Reebok              |Question Low        |0599.90|42|14
-00140|Nike                |Air Jordan 4        |1599.90|38|05
+00140|Nike                |Air Jordan 4        |1700.00|42|02
 00141|Adidas              |Tubular Shadow      |0499.50|39|06
 00142|Puma                |Smash               |0399.90|40|07
 00143|Nike                |Air Max Plus        |1099.90|41|08

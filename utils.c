@@ -101,13 +101,32 @@ Tenis lerTenis() {
 
     return t;
 }
+// Implemente limparString primeiro
+void limparString(const char *origem, char *destino) {
+    int i = 0, j = 0;
+    while (origem[i] != '\0' && j < MARCA_TAM-1) {
+        if (isprint((unsigned char)origem[i])) {
+            destino[j++] = origem[i];
+        }
+        i++;
+    }
+    destino[j] = '\0';
+}
+
 
 void exibirTenis(const Tenis *t) {
     if (t == NULL) return;
+    
+    // Limpar caracteres não-ASCII
+    char marca_limpa[MARCA_TAM];
+    char modelo_limpo[MODELO_TAM];
+    limparString(t->marca, marca_limpa);
+    limparString(t->modelo, modelo_limpo);
+    
     printf("%05d | %-20s | %-20s | %7.2f | %2d | %2d\n",
-           t->codigo, t->marca, t->modelo, t->preco, t->tamanho, t->quantidade);
+           t->codigo, marca_limpa, modelo_limpo, 
+           t->preco, t->tamanho, t->quantidade);
 }
-
 static bool criarDiretorioSeNecessario() {
     if (MKDIR("dados") != 0 && errno != EEXIST) {
         perror("Erro ao criar diretorio");
@@ -137,8 +156,10 @@ bool salvarTenis(Tenis *t) {
 
     fseek(f, 0, SEEK_END);
     long pos = ftell(f);
+    limparString(t->marca, t->marca);
+    limparString(t->modelo, t->modelo);
     
-    if (fprintf(f, "%05d|%-20s|%-20s|%07.2f|%02d|%02d\n",
+    if (fprintf(f, "%05d|%20s|%20s|%07.2f|%02d|%02d\n",  
             t->codigo, t->marca, t->modelo, t->preco, t->tamanho, t->quantidade) < 0) {
         perror("Erro ao escrever no arquivo");
         fclose(f);
@@ -184,14 +205,19 @@ bool buscarTenis(int codigo, Tenis *resultado) {
     // Limpar estrutura antes de preencher
     memset(resultado, 0, sizeof(Tenis));
     
+    // Corrigir o sscanf para ler corretamente
     if (sscanf(linha, "%d|%20[^|]|%20[^|]|%f|%d|%d",
-              &resultado->codigo, resultado->marca, resultado->modelo,
-              &resultado->preco, &resultado->tamanho, &resultado->quantidade) != 6) {
-        printf("Erro ao ler registro do arquivo!\n");
+        &resultado->codigo, resultado->marca, resultado->modelo,
+        &resultado->preco, &resultado->tamanho, &resultado->quantidade) != 6) {
+        printf("Erro ao ler registro do arquivo! Linha: %s\n", linha);
         return false;
-    }
+}
 
-    return true;
+// Limpar os campos após a leitura
+        limparString(resultado->marca, resultado->marca);
+        limparString(resultado->modelo, resultado->modelo);
+
+        return true;
 }
 
 bool alterarTenis(int codigo) {
@@ -358,4 +384,37 @@ bool mesclarArquivoNovosTenis() {
 bool mesclarArquivo(const char *nomeArquivo) {
     // Implementação mantida para compatibilidade
     return mesclarArquivoNovosTenis();
+}
+// Adicione esta função em utils.c
+bool buscarTenisPorTexto(const char *texto, Tenis *resultados, int *quantidade) {
+    if (texto == NULL || resultados == NULL || quantidade == NULL) {
+        return false;
+    }
+
+    FILE *f = fopen("dados/dados.txt", "r");
+    if (!f) {
+        perror("Erro ao abrir arquivo de dados");
+        return false;
+    }
+
+    *quantidade = 0;
+    char linha[REGISTRO_TAM + 2];
+    Tenis t;
+
+    while (fgets(linha, sizeof(linha), f)) {
+        memset(&t, 0, sizeof(Tenis));
+        
+        if (sscanf(linha, "%d|%20[^|]|%20[^|]|%f|%d|%d",
+                  &t.codigo, t.marca, t.modelo, &t.preco, &t.tamanho, &t.quantidade) != 6) {
+            continue;
+        }
+
+        if (strcasestr(t.marca, texto) != NULL || strcasestr(t.modelo, texto) != NULL) {
+            resultados[*quantidade] = t;
+            (*quantidade)++;
+        }
+    }
+
+    fclose(f);
+    return true;
 }
