@@ -69,7 +69,7 @@ int main() {
                 break;
             case 5: {
                     printf("\n=== Mesclar Arquivo ===\n");
-                    printf("Esta operação irá mesclar o arquivo 'novos_tenis.txt' da pasta dados.\n");
+                    printf("Esta operacao ira mesclar o arquivo 'novos_tenis.txt' da pasta dados.\n");
                     printf("Deseja continuar? (s/n): ");
                     
                     char confirmacao;
@@ -78,10 +78,10 @@ int main() {
                     
                     if (confirmacao == 's' || confirmacao == 'S') {
                         if (mesclarArquivoNovosTenis()) {
-                            printf("Operação concluída com sucesso!\n");
+                            printf("Operacao concluida com sucesso!\n");
                         }
                     } else {
-                        printf("Operação cancelada.\n");
+                        printf("Operacao cancelada.\n");
                     }
                     break;
                 }
