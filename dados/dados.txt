@@ -1,51 +1,50 @@
-00001|NIKE                |AIR FORCE           |0700.00|42|10
-00100|Marca0              |Modelo2             |0300.00|38|05
-00101|Marca1              |Modelo3             |0325.50|39|06
-00102|Marca2              |Modelo4             |0351.00|40|07
-00103|Marca3              |Modelo5             |0376.50|41|08
-00104|Marca4              |Modelo6             |0402.00|42|09
-00105|Marca5              |Modelo0             |0427.50|38|10
-00106|Marca6              |Modelo1             |0453.00|39|11
-00107|Marca7              |Modelo2             |0478.50|40|12
-00108|Marca8              |Modelo3             |0504.00|41|13
-00109|Marca9              |Modelo4             |0529.50|42|14
-00110|Marca0              |Modelo5             |0300.00|38|05
-00111|Marca1              |Modelo6             |0325.50|39|06
-00112|Marca2              |Modelo0             |0351.00|40|07
-00113|Marca3              |Modelo1             |0376.50|41|08
-00114|Marca4              |Modelo2             |0402.00|42|09
-00115|Marca5              |Modelo3             |0427.50|38|10
-00116|Marca6              |Modelo4             |0453.00|39|11
-00117|Marca7              |Modelo5             |0478.50|40|12
-00118|Marca8              |Modelo6             |0504.00|41|13
-00119|Marca9              |Modelo0             |0529.50|42|14
-00120|Marca0              |Modelo1             |0300.00|38|05
-00121|Marca1              |Modelo2             |0325.50|39|06
-00122|Marca2              |Modelo3             |0351.00|40|07
-00123|Marca3              |Modelo4             |0376.50|41|08
-00124|Marca4              |Modelo5             |0402.00|42|09
-00125|Marca5              |Modelo6             |0427.50|38|10
-00126|Marca6              |Modelo0             |0453.00|39|11
-00127|Marca7              |Modelo1             |0478.50|40|12
-00128|Marca8              |Modelo2             |0504.00|41|13
-00129|Marca9              |Modelo3             |0529.50|42|14
-00130|Marca0              |Modelo4             |0300.00|38|05
-00131|Marca1              |Modelo5             |0325.50|39|06
-00132|Marca2              |Modelo6             |0351.00|40|07
-00133|Marca3              |Modelo0             |0376.50|41|08
-00134|Marca4              |Modelo1             |0402.00|42|09
-00135|Marca5              |Modelo2             |0427.50|38|10
-00136|Marca6              |Modelo3             |0453.00|39|11
-00137|Marca7              |Modelo4             |0478.50|40|12
-00138|Marca8              |Modelo5             |0504.00|41|13
-00139|Marca9              |Modelo6             |0529.50|42|14
-00140|Marca0              |Modelo0             |0300.00|38|05
-00141|Marca1              |Modelo1             |0325.50|39|06
-00142|Marca2              |Modelo2             |0351.00|40|07
-00143|Marca3              |Modelo3             |0376.50|41|08
-00144|Marca4              |Modelo4             |0402.00|42|09
-00145|Marca5              |Modelo5             |0427.50|38|10
-00146|Marca6              |Modelo6             |0453.00|39|11
-00147|Marca7              |Modelo0             |0478.50|40|12
-00148|Marca8              |Modelo1             |0504.00|41|13
-00149|Marca9              |Modelo2             |0529.50|42|14
+00001|NIKE                |AIR FORCE           |0700.00|42|02
+00100|Nike                |Air Force 1         |0799.90|38|05
+00101|Adidas              |Superstar           |0699.50|39|06
+00102|Nike                |Air Max 90          |0899.00|40|07
+00103|Adidas              |Ultraboost          |1099.90|41|08
+00104|Puma                |RS-X                |0549.90|42|09
+00105|Nike                |Jordan 1 Retro      |1299.00|38|10
+00106|Adidas              |NMD_R1              |0799.50|39|11
+00107|Puma                |Cali                |0499.90|40|12
+00108|Nike                |Blazer Mid          |0659.90|41|13
+00109|Adidas              |Stan Smith          |0599.50|42|14
+00110|Vans                |Old Skool           |0399.90|38|05
+00112|Nike                |Dunk Low            |0899.00|40|07
+00113|Adidas              |Gazelle             |0549.90|41|08
+00114|Puma                |Suede Classic       |0399.90|42|09
+00115|Nike                |Air Max 270         |0999.00|38|10
+00116|Adidas              |ZX 2K 4D            |1499.90|39|11
+00117|New Balance         |574                 |0599.90|40|12
+00118|Asics               |Gel-Lyte III        |0699.90|41|13
+00119|Reebok              |Classic Leather     |0499.50|42|14
+00120|Nike                |Air VaporMax        |1399.90|38|05
+00121|Adidas              |Yeezy Boost 350     |2499.90|39|06
+00122|Puma                |Future Rider        |0449.90|40|07
+00123|Nike                |Pegasus 39          |0899.90|41|08
+00124|Adidas              |Forum Low           |0649.90|42|09
+00125|Vans                |Sk8-Hi              |0459.90|38|10
+00126|Converse            |One Star            |0399.50|39|11
+00127|New Balance         |997                 |0799.90|40|12
+00128|Asics               |Gel-Kayano 28       |0999.90|41|13
+00129|Reebok              |Club C 85           |0499.90|42|14
+00130|Nike                |Air Max 97          |1199.90|38|05
+00131|Adidas              |Continental 80      |0499.50|39|06
+00132|Puma                |Cell Venom          |0599.90|40|07
+00133|Nike                |React Element 55    |0899.90|41|08
+00134|Adidas              |Rivalry Low         |0600.00|42|05
+00135|Vans                |Authentic           |0349.90|38|10
+00136|Converse            |Jack Purcell        |0429.50|39|11
+00137|New Balance         |X90                 |0699.90|40|12
+00138|Asics               |Gel-Nimbus 24       |0899.90|41|13
+00139|Reebok              |Question Low        |0599.90|42|14
+00140|Nike                |Air Jordan 4        |1599.90|38|05
+00141|Adidas              |Tubular Shadow      |0499.50|39|06
+00142|Puma                |Smash               |0399.90|40|07
+00143|Nike                |Air Max Plus        |1099.90|41|08
+00144|Adidas              |Ozweego             |0699.90|42|09
+00145|Vans                |Era                 |0500.00|38|10
+00146|Converse            |Pro Leather         |0459.50|39|11
+00147|New Balance         |FuelCell Rebel      |0899.90|40|12
+00148|Asics               |Gel-Quantum 360     |1199.90|41|13
+00149|Reebok              |Instapump Fury      |0799.90|42|14

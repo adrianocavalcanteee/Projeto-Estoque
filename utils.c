@@ -12,6 +12,26 @@
 #include <sys/stat.h>
 #define MKDIR(a) mkdir(a, 0700)
 #endif
+#ifdef _WIN32
+#include <ctype.h>
+
+char *strcasestr(const char *haystack, const char *needle) {
+    if (!*needle) return (char *)haystack;
+    
+    for (; *haystack; haystack++) {
+        if (toupper(*haystack) == toupper(*needle)) {
+            const char *h = haystack, *n = needle;
+            for (; *h && *n; h++, n++) {
+                if (toupper(*h) != toupper(*n)) {
+                    break;
+                }
+            }
+            if (!*n) return (char *)haystack;
+        }
+    }
+    return NULL;
+}
+#endif
 
 void limparBuffer() {
     int c;
@@ -258,30 +278,11 @@ bool mesclarArquivoNovosTenis() {
         printf("Certifique-se que o arquivo existe e tem este nome exato.\n");
         return false;
     }
-    fclose(fNovo);
-
-    printf("Iniciando mesclagem...\n");
+    // Primeiro, processar novos registros para verificar códigos duplicados
     int registrosAdicionados = 0;
     int registrosIgnorados = 0;
-
-    FILE *fTemp = fopen("dados/temp.txt", "w");
-    if (!fTemp) {
-        perror("Erro ao criar arquivo temporario");
-        return false;
-    }
-
-    // Copiar dados existentes
-    FILE *fAtual = fopen("dados/dados.txt", "r");
-    if (fAtual) {
-        char linha[REGISTRO_TAM + 2];
-        while (fgets(linha, sizeof(linha), fAtual)) {
-            fprintf(fTemp, "%s", linha);
-        }
-        fclose(fAtual);
-    }
-
-    // Processar novos registros
-    fNovo = fopen(nomeArquivo, "r");
+    Tenis *novosTenis = NULL;
+    int numNovos = 0;
     char linha[REGISTRO_TAM + 2];
     while (fgets(linha, sizeof(linha), fNovo)) {
         Tenis t;
@@ -298,24 +299,54 @@ bool mesclarArquivoNovosTenis() {
             continue;
         }
 
-        long pos = ftell(fTemp);
-        fprintf(fTemp, "%05d|%-20s|%-20s|%07.2f|%02d|%02d\n",
-                t.codigo, t.marca, t.modelo, t.preco, t.tamanho, t.quantidade);
-        
-        RegistroIndice reg = {t.codigo, pos};
-        inserirNaArvoreB(reg);
-        registrosAdicionados++;
+        // Adicionar à lista de novos tênis
+        numNovos++;
+        novosTenis = realloc(novosTenis, numNovos * sizeof(Tenis));
+        novosTenis[numNovos-1] = t;
+    }
+    fclose(fNovo);
+
+    if (numNovos == 0) {
+        printf("Nenhum registro novo para adicionar.\n");
+        free(novosTenis);
+        return true;
     }
 
-    fclose(fNovo);
-    fclose(fTemp);
-
-    // Substituir arquivo original
-    remove("dados/dados.txt");
-    if (rename("dados/temp.txt", "dados/dados.txt") != 0) {
-        perror("Erro ao substituir arquivo de dados");
+    // Agora abrir o arquivo principal em modo append
+    FILE *fAtual = fopen("dados/dados.txt", "a+");
+    if (!fAtual) {
+        perror("Erro ao abrir arquivo de dados");
+        free(novosTenis);
         return false;
     }
+
+    // Posicionar no final do arquivo
+    fseek(fAtual, 0, SEEK_END);
+    
+    // Adicionar os novos registros
+    for (int i = 0; i < numNovos; i++) {
+        long pos = ftell(fAtual);
+        Tenis *t = &novosTenis[i];
+        
+        if (fprintf(fAtual, "%05d|%-20s|%-20s|%07.2f|%02d|%02d\n",
+                t->codigo, t->marca, t->modelo, t->preco, t->tamanho, t->quantidade) < 0) {
+            perror("Erro ao escrever no arquivo");
+            fclose(fAtual);
+            free(novosTenis);
+            return false;
+        }
+        
+        // Adicionar ao índice
+        RegistroIndice reg = {t->codigo, pos};
+        if (!inserirNaArvoreB(reg)) {
+            printf("Erro ao atualizar indice para codigo %d!\n", t->codigo);
+        } else {
+            registrosAdicionados++;
+        }
+    }
+
+    fclose(fAtual);
+    free(novosTenis);
 
     printf("Mesclagem concluida:\n");
     printf("- Registros adicionados: %d\n", registrosAdicionados);
