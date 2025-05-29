@@ -1,50 +1,99 @@
-// === main.c ===
 #include "utils.h"
-#include "arvoreb.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+
+void mostrarMenu() {
+    printf("\n=== Sistema de Tenis ===\n");
+    printf("1. Inserir novo tenis\n");
+    printf("2. Buscar tenis\n");
+    printf("3. Alterar tenis\n");
+    printf("4. Listar todos\n");
+    printf("5. Mesclar arquivo\n");
+    printf("0. Sair\n");
+    printf("Escolha: ");
+}
 
 int main() {
-    int opcao, codigo;
-    inicializarArvoreB();
+    if (!inicializarSistema()) {
+        fprintf(stderr, "Falha ao inicializar sistema!\n");
+        return EXIT_FAILURE;
+    }
 
+    int opcao;
     do {
-        printf("\n1 - Inserir\n2 - Buscar\n3 - Alterar\n4 - Listar\n5 - Mesclar Dados\n0 - Sair\nOpcao: ");
-
-        if (scanf("%d", &opcao) != 1) {
-            limparBuffer();
-            continue;
-        }
+        mostrarMenu();
+        scanf("%d", &opcao);
         limparBuffer();
 
         switch (opcao) {
-            case 1: salvarTenis(lerTenis()); break;
-            case 2:
-                printf("Codigo: ");
-                if (scanf("%d", &codigo) == 1) {
-                    limparBuffer();
-                    exibirTenis(buscarTenis(codigo));
+            case 1: {
+                Tenis t = lerTenis();
+                if (salvarTenis(&t)) {
+                    printf("Tenis salvo com sucesso!\n");
                 } else {
-                    limparBuffer();
-                    printf("Codigo invalido!\n");
+                    printf("Falha ao salvar tenis!\n");
                 }
                 break;
-            case 3:
+            }
+            case 2: {
                 printf("Codigo: ");
-                if (scanf("%d", &codigo) == 1) {
-                    limparBuffer();
-                    alterarTenis(codigo);
+                int codigo;
+                scanf("%d", &codigo);
+                limparBuffer();
+                
+                Tenis resultado;
+                if (buscarTenis(codigo, &resultado)) {
+                    exibirTenis(&resultado);
                 } else {
-                    limparBuffer();
-                    printf("Codigo invalido!\n");
+                    printf("Tenis nao encontrado!\n");
                 }
                 break;
-            case 4: listarTenis(); break;
-            case 5: mesclarDados(); break;
-            case 0: printf("Encerrando o programa.\n"); break;
-            default: printf("Opcao invalida.\n");
+            }
+            case 3: {
+                printf("Codigo para alterar: ");
+                int codigo;
+                scanf("%d", &codigo);
+                limparBuffer();
+                
+                if (alterarTenis(codigo)) {
+                    printf("Tenis alterado com sucesso!\n");
+                } else {
+                    printf("Falha ao alterar tenis!\n");
+                }
+                break;
+            }
+            case 4:
+                listarTenis();
+                break;
+            case 5: {
+                    printf("\n=== Mesclar Arquivo ===\n");
+                    printf("Esta operação irá mesclar o arquivo 'novos_tenis.txt' da pasta dados.\n");
+                    printf("Deseja continuar? (s/n): ");
+                    
+                    char confirmacao;
+                    scanf(" %c", &confirmacao);
+                    limparBuffer();
+                    
+                    if (confirmacao == 's' || confirmacao == 'S') {
+                        if (mesclarArquivoNovosTenis()) {
+                            printf("Operação concluída com sucesso!\n");
+                        }
+                    } else {
+                        printf("Operação cancelada.\n");
+                    }
+                    break;
+                }
+            
+            case 0:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opcao invalida!\n");
         }
     } while (opcao != 0);
 
-    return 0;
+    finalizarSistema();
+    return EXIT_SUCCESS;
 }

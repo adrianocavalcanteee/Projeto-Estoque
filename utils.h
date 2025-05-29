@@ -1,25 +1,33 @@
-// === utils.h ===
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MARCA_TAM 20
+#define MODELO_TAM 20
+#define REGISTRO_TAM 90
+
 typedef struct {
     int codigo;
-    char marca[20];
-    char modelo[20];
+    char marca[MARCA_TAM];
+    char modelo[MODELO_TAM];
     float preco;
     int tamanho;
     int quantidade;
 } Tenis;
 
-Tenis lerTenis();
-void exibirTenis(Tenis t);
-void salvarTenis(Tenis t);
-Tenis buscarTenis(int codigo);
-void alterarTenis(int codigo);
-void listarTenis();
-Tenis lerLinhaRegistro(char *linha);
-char *formatarTenis(Tenis t);
+// Interface das funções
 void limparBuffer();
-void mesclarDados();
+Tenis lerTenis();
+void exibirTenis(const Tenis *t);
+bool salvarTenis(Tenis *t);
+bool buscarTenis(int codigo, Tenis *resultado);
+bool alterarTenis(int codigo);
+void listarTenis();
+bool inicializarSistema();
+void finalizarSistema();
+bool mesclarArquivo(const char *novoArquivo);
+bool mesclarArquivoNovosTenis();
 
 #endif

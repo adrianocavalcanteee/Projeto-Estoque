@@ -3,14 +3,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #ifdef _WIN32
-#include <direct.h>  // Para mkdir no Windows
+#include <direct.h>
+#define MKDIR(a) _mkdir(a)
 #else
-#include <sys/stat.h>  // Para mkdir no Linux/macOS
+#include <sys/stat.h>
+#define MKDIR(a) mkdir(a, 0700)
 #endif
-
-#define REGISTRO_TAM 90
 
 void limparBuffer() {
     int c;
@@ -19,124 +20,209 @@ void limparBuffer() {
 
 Tenis lerTenis() {
     Tenis t = {0};
+    
+    do {
+        printf("Codigo: ");
+        if (scanf("%d", &t.codigo) != 1) {
+            limparBuffer();
+            printf("Codigo invalido! Digite um numero.\n");
+            continue;
+        }
+        limparBuffer();
+    } while (t.codigo <= 0);
 
-    printf("Codigo: ");
-    scanf("%d", &t.codigo);
-    limparBuffer();
+    do {
+        printf("Marca (max %d chars): ", MARCA_TAM-1);
+        if (!fgets(t.marca, MARCA_TAM, stdin)) {
+            limparBuffer();
+            continue;
+        }
+        t.marca[strcspn(t.marca, "\n")] = '\0';
+    } while (strlen(t.marca) == 0);
 
-    printf("Marca: ");
-    fgets(t.marca, sizeof(t.marca), stdin);
-    t.marca[strcspn(t.marca, "\n")] = '\0';
+    do {
+        printf("Modelo (max %d chars): ", MODELO_TAM-1);
+        if (!fgets(t.modelo, MODELO_TAM, stdin)) {
+            limparBuffer();
+            continue;
+        }
+        t.modelo[strcspn(t.modelo, "\n")] = '\0';
+    } while (strlen(t.modelo) == 0);
 
-    printf("Modelo: ");
-    fgets(t.modelo, sizeof(t.modelo), stdin);
-    t.modelo[strcspn(t.modelo, "\n")] = '\0';
+    do {
+        printf("Preco: ");
+        if (scanf("%f", &t.preco) != 1) {
+            limparBuffer();
+            printf("Preco invalido! Digite um numero.\n");
+            continue;
+        }
+        limparBuffer();
+    } while (t.preco <= 0);
 
-    printf("Preco: ");
-    scanf("%f", &t.preco);
-    limparBuffer();
+    do {
+        printf("Tamanho: ");
+        if (scanf("%d", &t.tamanho) != 1) {
+            limparBuffer();
+            printf("Tamanho invalido! Digite um numero.\n");
+            continue;
+        }
+        limparBuffer();
+    } while (t.tamanho <= 0);
 
-    printf("Tamanho: ");
-    scanf("%d", &t.tamanho);
-    limparBuffer();
-
-    printf("Quantidade: ");
-    scanf("%d", &t.quantidade);
-    limparBuffer();
+    do {
+        printf("Quantidade: ");
+        if (scanf("%d", &t.quantidade) != 1) {
+            limparBuffer();
+            printf("Quantidade invalida! Digite um numero.\n");
+            continue;
+        }
+        limparBuffer();
+    } while (t.quantidade <= 0);
 
     return t;
 }
 
-void exibirTenis(Tenis t) {
-    printf("Codigo: %d | Marca: %s | Modelo: %s | Preco: %.2f | Tamanho: %d | Quantidade: %d\n",
-           t.codigo, t.marca, t.modelo, t.preco, t.tamanho, t.quantidade);
+void exibirTenis(const Tenis *t) {
+    if (t == NULL) return;
+    printf("%05d | %-20s | %-20s | %7.2f | %2d | %2d\n",
+           t->codigo, t->marca, t->modelo, t->preco, t->tamanho, t->quantidade);
 }
 
-char *formatarTenis(Tenis t) {
-    static char linha[REGISTRO_TAM + 1];
-    snprintf(linha, sizeof(linha), "%05d|%-20s|%-20s|%07.2f|%02d|%02d",
-             t.codigo, t.marca, t.modelo, t.preco, t.tamanho, t.quantidade);
-    return linha;
+static bool criarDiretorioSeNecessario() {
+    if (MKDIR("dados") != 0 && errno != EEXIST) {
+        perror("Erro ao criar diretorio");
+        return false;
+    }
+    return true;
 }
 
-// ✅ CORRIGIDA: agora suporta campos de tamanho variável
-Tenis lerLinhaRegistro(char *linha) {
-    Tenis t = {0};
-    sscanf(linha, "%d|%[^|]|%[^|]|%f|%d|%d",
-           &t.codigo, t.marca, t.modelo, &t.preco, &t.tamanho, &t.quantidade);
-    return t;
-}
+bool salvarTenis(Tenis *t) {
+    if (t == NULL) return false;
 
-void salvarTenis(Tenis t) {
+    if (!criarDiretorioSeNecessario()) {
+        return false;
+    }
+
+    // Verificar se código já existe
+    if (buscarNaArvoreB(t->codigo) != -1) {
+        printf("Erro: Codigo %d ja existe!\n", t->codigo);
+        return false;
+    }
+
     FILE *f = fopen("dados/dados.txt", "a+");
     if (!f) {
-        mkdir("dados");  // Compatível com Windows
-        f = fopen("dados/dados.txt", "a+");
-        if (!f) {
-            perror("Erro ao criar arquivo de dados");
-            return;
-        }
+        perror("Erro ao abrir arquivo de dados");
+        return false;
     }
 
     fseek(f, 0, SEEK_END);
     long pos = ftell(f);
-    fprintf(f, "%s\n", formatarTenis(t));
-    fclose(f);
+    
+    if (fprintf(f, "%05d|%-20s|%-20s|%07.2f|%02d|%02d\n",
+            t->codigo, t->marca, t->modelo, t->preco, t->tamanho, t->quantidade) < 0) {
+        perror("Erro ao escrever no arquivo");
+        fclose(f);
+        return false;
+    }
+    
+    if (fclose(f) != 0) {
+        perror("Erro ao fechar arquivo");
+        return false;
+    }
 
-    RegistroIndice reg = {t.codigo, pos};
-    inserirNaArvoreB(reg);
-    printf("Tenis salvo com sucesso!\n");
+    RegistroIndice reg = {t->codigo, pos};
+    if (!inserirNaArvoreB(reg)) {
+        printf("Erro ao atualizar indice!\n");
+        return false;
+    }
+
+    return true;
 }
 
-Tenis buscarTenis(int codigo) {
+bool buscarTenis(int codigo, Tenis *resultado) {
+    if (resultado == NULL) return false;
+
     long pos = buscarNaArvoreB(codigo);
-    Tenis t = {0};
-    if (pos == -1) return t;
+    if (pos == -1) {
+        return false;
+    }
 
     FILE *f = fopen("dados/dados.txt", "r");
-    if (!f) return t;
+    if (!f) {
+        perror("Erro ao abrir arquivo de dados");
+        return false;
+    }
 
     fseek(f, pos, SEEK_SET);
     char linha[REGISTRO_TAM + 2];
-    fgets(linha, sizeof(linha), f);
+    if (!fgets(linha, sizeof(linha), f)) {
+        fclose(f);
+        return false;
+    }
     fclose(f);
 
-    t = lerLinhaRegistro(linha);
-    return t;
+    // Limpar estrutura antes de preencher
+    memset(resultado, 0, sizeof(Tenis));
+    
+    if (sscanf(linha, "%d|%20[^|]|%20[^|]|%f|%d|%d",
+              &resultado->codigo, resultado->marca, resultado->modelo,
+              &resultado->preco, &resultado->tamanho, &resultado->quantidade) != 6) {
+        printf("Erro ao ler registro do arquivo!\n");
+        return false;
+    }
+
+    return true;
 }
 
-void alterarTenis(int codigo) {
-    long pos = buscarNaArvoreB(codigo);
-    if (pos == -1) {
-        printf("Codigo nao encontrado.\n");
-        return;
+bool alterarTenis(int codigo) {
+    Tenis antigo, novo;
+    if (!buscarTenis(codigo, &antigo)) {
+        printf("Tenis nao encontrado!\n");
+        return false;
     }
 
-    Tenis novo = lerTenis();
-    FILE *f = fopen("dados/dados.txt", "a");
-    if (!f) return;
+    printf("Editando tenis:\n");
+    exibirTenis(&antigo);
+    printf("\nNovos dados:\n");
+    novo = lerTenis();
 
-    long novaPos = ftell(f);
-    fprintf(f, "%s\n", formatarTenis(novo));
+    // Verificar se novo código já existe (se for diferente)
+    if (novo.codigo != codigo && buscarNaArvoreB(novo.codigo) != -1) {
+        printf("Erro: Codigo %d ja existe!\n", novo.codigo);
+        return false;
+    }
+
+    FILE *f = fopen("dados/dados.txt", "r+");
+    if (!f) {
+        perror("Erro ao abrir arquivo para edicao");
+        return false;
+    }
+    long pos = buscarNaArvoreB(codigo);
+    fseek(f, pos, SEEK_SET);
+    
+    if (fprintf(f, "%05d|%-20s|%-20s|%07.2f|%02d|%02d",
+               novo.codigo, novo.marca, novo.modelo, novo.preco, novo.tamanho, novo.quantidade) < 0) {
+        perror("Erro ao escrever no arquivo");
+        fclose(f);
+        return false;
+    }
+    
     fclose(f);
 
-    for (int i = 0; i < totalIndices; i++) {
-        if (indices[i].codigo == codigo) {
-            indices[i].pos = novaPos;
-            break;
-        }
+    // Atualizar índice se código mudou
+    if (codigo != novo.codigo) {
+        removerDaArvoreB(codigo);
+        RegistroIndice reg = {novo.codigo, pos};
+        inserirNaArvoreB(reg);
     }
-    salvarIndice();
-    printf("Tenis alterado com sucesso!\n");
+
+    return true;
 }
 
 void listarTenis() {
     printf("\n=== Lista de Tenis ===\n");
-
-    if (totalIndices == 0) {
-        printf("Nenhum tenis cadastrado.\n");
-        return;
-    }
+    printf("COD.  | MARCA               | MODELO              | PRECO   | TM | QTD\n");
+    printf("----------------------------------------------------------------------\n");
 
     FILE *f = fopen("dados/dados.txt", "r");
     if (!f) {
@@ -144,86 +230,101 @@ void listarTenis() {
         return;
     }
 
-    for (int i = 0; i < totalIndices; i++) {
-        fseek(f, indices[i].pos, SEEK_SET);
-        char linha[REGISTRO_TAM + 2] = {0};
-        if (fgets(linha, sizeof(linha), f)) {
-            linha[strcspn(linha, "\n")] = '\0';
-            Tenis t = lerLinhaRegistro(linha);
-            if (t.codigo > 0) {
-                exibirTenis(t);
-            }
-        }
-    }
-
+    percorrerEmOrdem(raiz, f);
     fclose(f);
 }
 
-void mesclarDados() {
-    FILE *f1 = fopen("dados/dados.txt", "r");
-    FILE *f2 = fopen("dados/novos.txt", "r");
-    if (!f1 && !f2) {
-        printf("Nenhum dos arquivos foi encontrado.\n");
-        return;
+bool inicializarSistema() {
+    if (!criarDiretorioSeNecessario()) {
+        return false;
     }
+    inicializarArvoreB();
+    return true;
+}
 
-    Tenis todos[2000];
-    int count = 0;
-
-    char linha[REGISTRO_TAM + 2];
-    if (f1) {
-        while (fgets(linha, sizeof(linha), f1)) {
-            Tenis t = lerLinhaRegistro(linha);
-            todos[count++] = t;
-        }
-        fclose(f1);
-    }
-
-    if (f2) {
-        while (fgets(linha, sizeof(linha), f2)) {
-            Tenis t = lerLinhaRegistro(linha);
-            int duplicado = 0;
-            for (int i = 0; i < count; i++) {
-                if (todos[i].codigo == t.codigo) {
-                    duplicado = 1;
-                    break;
-                }
-            }
-            if (!duplicado) {
-                todos[count++] = t;
-            }
-        }
-        fclose(f2);
-    }
-
-    // Ordena os registros por código
-    for (int i = 0; i < count - 1; i++) {
-        for (int j = 0; j < count - i - 1; j++) {
-            if (todos[j].codigo > todos[j + 1].codigo) {
-                Tenis tmp = todos[j];
-                todos[j] = todos[j + 1];
-                todos[j + 1] = tmp;
-            }
-        }
-    }
-
-    FILE *fout = fopen("dados/dados.txt", "w");
-    if (!fout) {
-        perror("Erro ao abrir dados.txt para escrita");
-        return;
-    }
-
-    totalIndices = 0;
-    for (int i = 0; i < count; i++) {
-        long pos = ftell(fout);
-        fprintf(fout, "%s\n", formatarTenis(todos[i]));
-        indices[totalIndices].codigo = todos[i].codigo;
-        indices[totalIndices].pos = pos;
-        totalIndices++;
-    }
-
-    fclose(fout);
+void finalizarSistema() {
     salvarIndice();
+}
 
-    printf("Mesclagem concluida: %d registros unificados e ordenados.\n", count);
+bool mesclarArquivoNovosTenis() {
+    const char *nomeArquivo = "dados/novos_tenis.txt";
+    
+    printf("\n=== Mesclagem de Arquivo ===\n");
+    printf("Verificando arquivo '%s'...\n", nomeArquivo);
+
+    FILE *fNovo = fopen(nomeArquivo, "r");
+    if (!fNovo) {
+        printf("Arquivo '%s' nao encontrado na pasta dados.\n", nomeArquivo);
+        printf("Certifique-se que o arquivo existe e tem este nome exato.\n");
+        return false;
+    }
+    fclose(fNovo);
+
+    printf("Iniciando mesclagem...\n");
+    int registrosAdicionados = 0;
+    int registrosIgnorados = 0;
+
+    FILE *fTemp = fopen("dados/temp.txt", "w");
+    if (!fTemp) {
+        perror("Erro ao criar arquivo temporario");
+        return false;
+    }
+
+    // Copiar dados existentes
+    FILE *fAtual = fopen("dados/dados.txt", "r");
+    if (fAtual) {
+        char linha[REGISTRO_TAM + 2];
+        while (fgets(linha, sizeof(linha), fAtual)) {
+            fprintf(fTemp, "%s", linha);
+        }
+        fclose(fAtual);
+    }
+
+    // Processar novos registros
+    fNovo = fopen(nomeArquivo, "r");
+    char linha[REGISTRO_TAM + 2];
+    while (fgets(linha, sizeof(linha), fNovo)) {
+        Tenis t;
+        if (sscanf(linha, "%d|%20[^|]|%20[^|]|%f|%d|%d",
+                  &t.codigo, t.marca, t.modelo, &t.preco, &t.tamanho, &t.quantidade) != 6) {
+            printf("Formato invalido na linha: %s", linha);
+            registrosIgnorados++;
+            continue;
+        }
+
+        if (buscarNaArvoreB(t.codigo) != -1) {
+            printf("Codigo %d ja existe - ignorando\n", t.codigo);
+            registrosIgnorados++;
+            continue;
+        }
+
+        long pos = ftell(fTemp);
+        fprintf(fTemp, "%05d|%-20s|%-20s|%07.2f|%02d|%02d\n",
+                t.codigo, t.marca, t.modelo, t.preco, t.tamanho, t.quantidade);
+        
+        RegistroIndice reg = {t.codigo, pos};
+        inserirNaArvoreB(reg);
+        registrosAdicionados++;
+    }
+
+    fclose(fNovo);
+    fclose(fTemp);
+
+    // Substituir arquivo original
+    remove("dados/dados.txt");
+    if (rename("dados/temp.txt", "dados/dados.txt") != 0) {
+        perror("Erro ao substituir arquivo de dados");
+        return false;
+    }
+
+    printf("Mesclagem concluida:\n");
+    printf("- Registros adicionados: %d\n", registrosAdicionados);
+    printf("- Registros ignorados: %d\n", registrosIgnorados);
+
+    return true;
+}
+
+bool mesclarArquivo(const char *nomeArquivo) {
+    // Implementação mantida para compatibilidade
+    return mesclarArquivoNovosTenis();
 }

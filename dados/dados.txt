@@ -1,5 +1,51 @@
-00001|nike                force               |force               |0500.00|42|02
-00003|nike                |air max             |0499.90|41|05
-00004|mizuno              |wave prophecy       |0720.00|43|02
-00005|asics               |gel nimbus          |0650.75|40|03
-00006|ADIDAS              |SUPERSTAR           |0500.00|42|02
+00001|NIKE                |AIR FORCE           |0700.00|42|10
+00100|Marca0              |Modelo2             |0300.00|38|05
+00101|Marca1              |Modelo3             |0325.50|39|06
+00102|Marca2              |Modelo4             |0351.00|40|07
+00103|Marca3              |Modelo5             |0376.50|41|08
+00104|Marca4              |Modelo6             |0402.00|42|09
+00105|Marca5              |Modelo0             |0427.50|38|10
+00106|Marca6              |Modelo1             |0453.00|39|11
+00107|Marca7              |Modelo2             |0478.50|40|12
+00108|Marca8              |Modelo3             |0504.00|41|13
+00109|Marca9              |Modelo4             |0529.50|42|14
+00110|Marca0              |Modelo5             |0300.00|38|05
+00111|Marca1              |Modelo6             |0325.50|39|06
+00112|Marca2              |Modelo0             |0351.00|40|07
+00113|Marca3              |Modelo1             |0376.50|41|08
+00114|Marca4              |Modelo2             |0402.00|42|09
+00115|Marca5              |Modelo3             |0427.50|38|10
+00116|Marca6              |Modelo4             |0453.00|39|11
+00117|Marca7              |Modelo5             |0478.50|40|12
+00118|Marca8              |Modelo6             |0504.00|41|13
+00119|Marca9              |Modelo0             |0529.50|42|14
+00120|Marca0              |Modelo1             |0300.00|38|05
+00121|Marca1              |Modelo2             |0325.50|39|06
+00122|Marca2              |Modelo3             |0351.00|40|07
+00123|Marca3              |Modelo4             |0376.50|41|08
+00124|Marca4              |Modelo5             |0402.00|42|09
+00125|Marca5              |Modelo6             |0427.50|38|10
+00126|Marca6              |Modelo0             |0453.00|39|11
+00127|Marca7              |Modelo1             |0478.50|40|12
+00128|Marca8              |Modelo2             |0504.00|41|13
+00129|Marca9              |Modelo3             |0529.50|42|14
+00130|Marca0              |Modelo4             |0300.00|38|05
+00131|Marca1              |Modelo5             |0325.50|39|06
+00132|Marca2              |Modelo6             |0351.00|40|07
+00133|Marca3              |Modelo0             |0376.50|41|08
+00134|Marca4              |Modelo1             |0402.00|42|09
+00135|Marca5              |Modelo2             |0427.50|38|10
+00136|Marca6              |Modelo3             |0453.00|39|11
+00137|Marca7              |Modelo4             |0478.50|40|12
+00138|Marca8              |Modelo5             |0504.00|41|13
+00139|Marca9              |Modelo6             |0529.50|42|14
+00140|Marca0              |Modelo0             |0300.00|38|05
+00141|Marca1              |Modelo1             |0325.50|39|06
+00142|Marca2              |Modelo2             |0351.00|40|07
+00143|Marca3              |Modelo3             |0376.50|41|08
+00144|Marca4              |Modelo4             |0402.00|42|09
+00145|Marca5              |Modelo5             |0427.50|38|10
+00146|Marca6              |Modelo6             |0453.00|39|11
+00147|Marca7              |Modelo0             |0478.50|40|12
+00148|Marca8              |Modelo1             |0504.00|41|13
+00149|Marca9              |Modelo2             |0529.50|42|14
