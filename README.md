@@ -39,3 +39,19 @@ Os dados são armazenados em dois arquivos:
 - Linguagem C
 - Estrutura de dados: Árvore B
 - Manipulação de arquivos texto e binário
+
+---
+
+## 🖥️ Como Compilar e Executar (Windows + Git Bash)
+
+Para compilar o projeto:
+
+```bash
+gcc main.c utils.c arvoreb.c -o tenis_app.exe
+```
+
+Para executar o programa:
+
+```bash
+winpty ./tenis_app.exe
+```
